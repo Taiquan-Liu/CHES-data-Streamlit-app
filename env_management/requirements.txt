@@ -1,0 +1,6 @@
+ipykernel
+jupyter
+jupyter-client
+jupyter-console
+jupyter-core
+streamlit
