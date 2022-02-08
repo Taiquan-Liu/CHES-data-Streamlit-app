@@ -1,4 +1,6 @@
+altair
 darker
+inflect
 ipykernel
 isort
 jupyter
