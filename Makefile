@@ -1,3 +1,6 @@
+lint:
+	darker --revision=origin/master... --isort ./*.py
+
 venv-create:
 	env_management/create_env.sh
 

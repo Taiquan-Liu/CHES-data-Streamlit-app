@@ -1,4 +1,6 @@
+darker
 ipykernel
+isort
 jupyter
 jupyter-client
 jupyter-console
