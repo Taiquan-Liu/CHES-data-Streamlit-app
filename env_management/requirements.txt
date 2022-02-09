@@ -8,3 +8,4 @@ jupyter-client
 jupyter-console
 jupyter-core
 streamlit
+tabula
