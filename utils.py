@@ -57,9 +57,60 @@ class codebook_loader:
 
             return df
 
-    def load_parties():
+    def load_parties(self, cache_name: str = "parties.pkl") -> pd.DataFrame:
+        """Load table of parties from codebook page 3-11"""
 
-        return
+        cache_file_path = self.cache_path / cache_name
+
+        if self.use_cache and cache_file_path.exists():
+
+            return pd.read_pickle(cache_file_path)
+
+        else:
+
+            tables = tabula.read_pdf(
+                "data/2019_CHES_codebook.pdf", area=[80, 40, 520, 800], pages="3-11"
+            )
+            df = pd.concat(tables, ignore_index=True)
+
+            # Drop the "Continued on next page" read as a row
+            df = df.drop(
+                df.loc[
+                    (df["Party Name (English)"] == "Continued on next page")
+                    | (df["Unnamed: 0"] == "Continued on next page")
+                ].index
+            )
+
+            # Drop the last useless column caused by having to read too much to right
+            df = df.drop(columns={"Unnamed: 0"})
+
+            # Fix parties with too long names which go to the second rows
+            second_rows = (
+                df.loc[
+                    df["Country"].isna()
+                    & df["Party ID"].isna()
+                    & df["Party Abbrev"].isna()
+                ]
+            ).index
+            first_rows = [i - 1 for i in second_rows]
+            df1 = df.loc[first_rows].fillna("")
+            df2 = df.loc[second_rows].fillna("")
+            df2.index = first_rows
+            df1["Party Name"] = df1["Party Name"] + df2["Party Name"]
+            df1["Party Name (English)"] = (
+                df1["Party Name (English)"] + df2["Party Name (English)"]
+            )
+            df.loc[first_rows] = df1
+            df = df.drop(second_rows)
+
+            # Forward fill all the NaNs in the country column
+            df["Country"] = df["Country"].ffill()
+
+            df = df.reset_index(drop=True)
+            df.to_pickle(cache_file_path)
+
+            return df
+
 
     def load_questions():
 
