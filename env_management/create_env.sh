@@ -10,5 +10,5 @@ python3.9 -m venv .venv
 
 source .venv/bin/activate
 
-pip install -Ur env_management/requirements.txt --use-feature=2020-resolver
+pip install -e .[development]
 python3.9 -m ipykernel install --sys-prefix --name ches-data
