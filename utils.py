@@ -39,9 +39,15 @@ class codebook_loader:
             tables = tabula.read_pdf(self.codebook_path, area=area, pages=2)
             df = tables[0]
 
-            return df.rename(
-                columns={"Country": "Country Abbreviation", "Country.1": "Country"}
+            # Rename the columns to be the same as in the dta/csv files
+            df = df.rename(
+                columns={"Country": "country", "Country.1": "Country Fullname"}
             ).drop(index=0)
+
+            # make country ids lower cases, same as in the dta/csv files
+            df["country"] = df["country"].str.lower()
+
+            return df
 
         cache_file_path = self.cache_path / cache_name
 
@@ -105,6 +111,18 @@ class codebook_loader:
 
             # Forward fill all the NaNs in the country column
             df["Country"] = df["Country"].ffill()
+
+            # Rename the columns to be the same as in the dta/csv files
+            df = df.rename(
+                columns={
+                    "Country": "country",
+                    "Party ID": "party_id",
+                    "Party Abbrev": "party",
+                }
+            ).drop(index=0)
+
+            # make country ids lower cases, same as in the dta/csv files
+            df["country"] = df["country"].str.lower()
 
             df = df.reset_index(drop=True)
             df.to_pickle(cache_file_path)
