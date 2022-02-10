@@ -19,7 +19,6 @@ setup(
     install_requires=[
         "altair",
         "darker",
-        "inflect",
         "isort",
         "streamlit",
         "tabula-py",
