@@ -156,3 +156,35 @@ class codebook_loader:
     def save_questions():
 
         return
+
+
+def dta_to_table(
+    sql_con: sl.Connection,
+    dta_path: str,
+    table_name: str,
+    skip_write_if_exist: bool = True,
+    if_exists: str = "fail",
+):
+    """Load csv data as SQL database table.
+
+    :param `sql_con`: SQL connection to a database
+    :param `dta_path`: dta file path to load
+    :param `table_name`: SQL table name to save
+    :param `skip_write_if_exist`: default True = skip write if table exists
+                                  in the db
+    :param `if_exists`: How to behave if the table already exists, only have
+                        effect when skip_write_if_exist is False, choose
+                        from {"fail", "replace", "append"}, default "fail"
+    """
+
+    if sqlite_check_table_exist(sql_con, table_name) and skip_write_if_exist:
+        pass
+    else:
+        df = pd.read_stata(dta_path)
+
+        # Cleaning up the data and unify column name
+        if "CHES2019_experts" in dta_path:
+            df = df.drop(columns={"id", "party"})
+            df = df.rename(columns={"party_name": "party"})
+
+        df.to_sql(table_name, sql_con, if_exists=if_exists)
