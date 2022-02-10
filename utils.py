@@ -1,47 +1,67 @@
+import sqlite3 as sl
 from pathlib import Path
 
 import pandas as pd
 import tabula
 
 
+def sqlite_check_table_exist(sql_con: sl.Connection, table_name: str) -> bool:
+    df_found_table = pd.read_sql(
+        f"""
+        SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}';
+    """,
+        sql_con,
+    )
+
+    return len(df_found_table) != 0
+
+
 class codebook_loader:
     """Load data from the code book.
 
-    :param codebook_path: folder for codebook, default "data/2019_CHES_codebook.pdf"
-    :param cache_path: folder to store cache files, default "cache/"
-    :param use_cache: if True, load data from cache_path; if False, always
-                      load data from codebook_path and save to cache_path
+    :param `sql_con`: SQL connection to a database
+    :param `codebook_path`: folder for codebook, default "data/2019_CHES_codebook.pdf"
+    :param `skip_write_if_exist`: default True = skip write if table exists in the db
+
     """
 
     def __init__(
         self,
+        sql_con: sl.Connection,
         codebook_path: str = "data/2019_CHES_codebook.pdf",
-        cache_path: str = "cache/",
-        use_cache: bool = True,
+        skip_write_if_exist: bool = True,
     ):
+        self.sql_con = sql_con
         self.codebook_path = Path(codebook_path).absolute()
-        self.cache_path = Path(cache_path).absolute()
-        self.use_cache = use_cache
+        self.skip_write_if_exist = skip_write_if_exist
 
-        if not self.cache_path.exists():
-            self.cache_path.mkdir()
+    def save_countries(self, table_name: str = "COUNTRIES", if_exists: str = "fail"):
+        """Load countries from codebook page 2 and save to table "countries" in
+        SQL database.
 
-    def load_contries(self, cache_name: str = "countries.pkl") -> pd.DataFrame:
-        """Load table of countries from codebook page 2"""
+        :param `table_name`: table name to store to SQL database
+        :param `if_exists`: How to behave if the table already exists, only have
+                            effect when skip_write_if_exist is False, choose
+                            from {"fail", "replace", "append"}, default "fail"
+        """
 
         def load_partial_contries(self, area: list[int]) -> pd.DataFrame:
             """The contry table in the codebook has left and right part, so we
             need to load them seperately. We also need to clean the part where
             tabula misunderstands the table.
 
-            :param area: [top, left, bottom, right]
+            :param `area`: [top, left, bottom, right]
             """
             tables = tabula.read_pdf(self.codebook_path, area=area, pages=2)
             df = tables[0]
 
             # Rename the columns to be the same as in the dta/csv files
             df = df.rename(
-                columns={"Country": "country", "Country.1": "Country Fullname"}
+                columns={
+                    "Country": "country",
+                    "Country ID": "country_id",
+                    "Country.1": "country_fullname",
+                }
             ).drop(index=0)
 
             # make country ids lower cases, same as in the dta/csv files
@@ -49,31 +69,34 @@ class codebook_loader:
 
             return df
 
-        cache_file_path = self.cache_path / cache_name
-
-        if self.use_cache and cache_file_path.exists():
-
-            return pd.read_pickle(cache_file_path)
-
+        if (
+            sqlite_check_table_exist(self.sql_con, table_name)
+            and self.skip_write_if_exist
+        ):
+            pass
         else:
             df_left = load_partial_contries(self, area=[153, 82, 403, 300])
             df_right = load_partial_contries(self, area=[153, 320, 403, 529])
             df = pd.concat([df_left, df_right], ignore_index=True)
-            df.to_pickle(cache_file_path)
 
-            return df
+            df.to_sql(table_name, self.sql_con, if_exists=if_exists)
 
-    def load_parties(self, cache_name: str = "parties.pkl") -> pd.DataFrame:
-        """Load table of parties from codebook page 3-11"""
+    def save_parties(self, table_name: str = "PARTIES", if_exists: str = "fail"):
+        """Load parties from codebook page 3-11 and save to table "parties" in
+        SQL database.
 
-        cache_file_path = self.cache_path / cache_name
+        :param `table_name`: table name to store to SQL database
+        :param `if_exists`: How to behave if the table already exists, only have
+                            effect when skip_write_if_exist is False, choose
+                            from {"fail", "replace", "append"}, default "fail"
+        """
 
-        if self.use_cache and cache_file_path.exists():
-
-            return pd.read_pickle(cache_file_path)
-
+        if (
+            sqlite_check_table_exist(self.sql_con, table_name)
+            and self.skip_write_if_exist
+        ):
+            pass
         else:
-
             tables = tabula.read_pdf(
                 "data/2019_CHES_codebook.pdf", area=[80, 40, 520, 800], pages="3-11"
             )
@@ -118,6 +141,8 @@ class codebook_loader:
                     "Country": "country",
                     "Party ID": "party_id",
                     "Party Abbrev": "party",
+                    "Party Name": "party_name",
+                    "Party Name (English)": "party_name_english",
                 }
             ).drop(index=0)
 
@@ -125,11 +150,9 @@ class codebook_loader:
             df["country"] = df["country"].str.lower()
 
             df = df.reset_index(drop=True)
-            df.to_pickle(cache_file_path)
 
-            return df
+            df.to_sql(table_name, self.sql_con, if_exists)
 
-
-    def load_questions():
+    def save_questions():
 
         return
