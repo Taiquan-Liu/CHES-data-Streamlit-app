@@ -98,7 +98,7 @@ class codebook_loader:
             pass
         else:
             tables = tabula.read_pdf(
-                "data/2019_CHES_codebook.pdf", area=[80, 40, 520, 800], pages="3-11"
+                "data/2019_CHES_codebook.pdf", area=[80, 40, 525, 800], pages="3-11"
             )
             df = pd.concat(tables, ignore_index=True)
 
@@ -135,6 +135,12 @@ class codebook_loader:
             # Forward fill all the NaNs in the country column
             df["Country"] = df["Country"].ffill()
 
+            # make country ids lower cases, same as in the dta/csv files
+            df["Country"] = df["Country"].str.lower()
+
+            # Change abbr for Hungary from hung to hun, same as COUNTRIES
+            df["Country"] = df["Country"].str.replace("hung", "hun")
+
             # Rename the columns to be the same as in the dta/csv files
             df = df.rename(
                 columns={
@@ -144,13 +150,7 @@ class codebook_loader:
                     "Party Name": "party_name",
                     "Party Name (English)": "party_name_english",
                 }
-            ).drop(index=0)
-
-            # make country ids lower cases, same as in the dta/csv files
-            df["country"] = df["country"].str.lower()
-
-            # Change abbr for Hungary from hung to hun, same as COUNTRIES
-            df["country"] = df["country"].str.replace("hung", "hun")
+            )
 
             df = df.reset_index(drop=True)
 
@@ -189,5 +189,11 @@ def dta_to_table(
         if "CHES2019_experts" in dta_path:
             df = df.drop(columns={"id", "party"})
             df = df.rename(columns={"party_name": "party"})
+
+            # Change Party ID of Fratelli d’Italia to 844, same as other tables
+            df["party_id"] = df["party_id"].replace(to_replace=843, value=844)
+
+            # Change Party ID of ChristenUnie to 1016, same as other tables
+            df["party_id"] = df["party_id"].replace(to_replace=1009, value=1016)
 
         df.to_sql(table_name, sql_con, if_exists=if_exists)

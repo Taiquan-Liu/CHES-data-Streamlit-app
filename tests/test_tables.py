@@ -31,7 +31,7 @@ def test_tables_from_codebook_joinable_by_country():
             FROM PARTIES
         """, con, index_col="index")
 
-    assert df_p["country"].unique() in df_c["country"].unique()
+    assert set(df_p["country"].unique()).issubset(df_c["country"].unique())
 
 
 def test_tables_joinable_by_party_id():
@@ -65,5 +65,5 @@ def test_tables_joinable_by_party_id():
             FROM EXPERTS
         """, con, index_col="index")
 
-    assert df_v3["party_id"].unique() in df_p["party_id"].unique()
-    assert df_e["party_id"].unique() in df_p["party_id"].unique()
+    assert set(df_v3["party_id"].unique()).issubset(df_p["party_id"].unique())
+    assert set(df_e["party_id"].unique()).issubset(df_p["party_id"].unique())
