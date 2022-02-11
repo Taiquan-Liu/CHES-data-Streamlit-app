@@ -122,7 +122,7 @@ class codebook_loader:
                 ]
             ).index
             first_rows = [i - 1 for i in second_rows]
-            df1 = df.loc[first_rows].fillna("")
+            df1 = df.loc[first_rows]
             df2 = df.loc[second_rows].fillna("")
             df2.index = first_rows
             df1["Party Name"] = df1["Party Name"] + df2["Party Name"]
@@ -148,6 +148,9 @@ class codebook_loader:
 
             # make country ids lower cases, same as in the dta/csv files
             df["country"] = df["country"].str.lower()
+
+            # Change abbr for Hungary from hung to hun, same as COUNTRIES
+            df["country"] = df["country"].str.replace("hung", "hun")
 
             df = df.reset_index(drop=True)
 
