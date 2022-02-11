@@ -141,6 +141,9 @@ class codebook_loader:
             # Change abbr for Hungary from hung to hun, same as COUNTRIES
             df["Country"] = df["Country"].str.replace("hung", "hun")
 
+            # Fill Remaining NaNs
+            df = df.fillna("")
+
             # Rename the columns to be the same as in the dta/csv files
             df = df.rename(
                 columns={
@@ -154,7 +157,7 @@ class codebook_loader:
 
             df = df.reset_index(drop=True)
 
-            df.to_sql(table_name, self.sql_con, if_exists)
+            df.to_sql(table_name, self.sql_con, if_exists=if_exists)
 
     def save_questions():
 
