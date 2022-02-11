@@ -5,17 +5,6 @@ import pandas as pd
 import tabula
 
 
-def sqlite_check_table_exist(sql_con: sl.Connection, table_name: str) -> bool:
-    df_found_table = pd.read_sql(
-        f"""
-        SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}';
-    """,
-        sql_con,
-    )
-
-    return len(df_found_table) != 0
-
-
 class codebook_loader:
     """Load data from the code book.
 
@@ -69,10 +58,7 @@ class codebook_loader:
 
             return df
 
-        if (
-            sqlite_check_table_exist(self.sql_con, table_name)
-            and self.skip_write_if_exist
-        ):
+        if pd.io.sql.has_table(table_name, self.sql_con) and self.skip_write_if_exist:
             pass
         else:
             df_left = load_partial_contries(self, area=[153, 82, 403, 300])
@@ -91,10 +77,7 @@ class codebook_loader:
                             from {"fail", "replace", "append"}, default "fail"
         """
 
-        if (
-            sqlite_check_table_exist(self.sql_con, table_name)
-            and self.skip_write_if_exist
-        ):
+        if pd.io.sql.has_table(table_name, self.sql_con) and self.skip_write_if_exist:
             pass
         else:
             tables = tabula.read_pdf(
@@ -183,7 +166,7 @@ def dta_to_table(
                         from {"fail", "replace", "append"}, default "fail"
     """
 
-    if sqlite_check_table_exist(sql_con, table_name) and skip_write_if_exist:
+    if pd.io.sql.has_table(table_name, sql_con) and skip_write_if_exist:
         pass
     else:
         df = pd.read_stata(dta_path)
