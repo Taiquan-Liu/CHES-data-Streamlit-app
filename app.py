@@ -196,7 +196,7 @@ st.set_page_config(
     menu_items={
         "Get help": "https://github.com/Taiquan-Liu/CHES-data-assignment",
         "Report a Bug": "https://github.com/Taiquan-Liu/CHES-data-assignment/issues",
-    }
+    },
 )
 
 with st.sidebar:
@@ -218,15 +218,40 @@ with st.sidebar:
 
     st.markdown("---")
 
+    plot_option = st.selectbox(
+        "How would you like to plot?",
+        ("Country Aggregation on each question", "Detailed survey result (Finland)"),
+    )
+
+    if plot_option == "Country Aggregation on each question":
+        plot_args = {
+            "default_multiselect_value_country": defaultdict(list),
+            "default_select_all_countries": True,
+            "default_select_all_parties": True,
+            "default_select_all_questions": False,
+            "subplot_var": "question",
+        }
+    elif plot_option == "Detailed survey result (Finland)":
+        plot_args = {
+            "default_multiselect_value_country": {
+                "country": ["fin"],
+                "country_id": [14],
+                "country_fullname": ["Finland"],
+            },
+            "default_select_all_countries": False,
+            "default_select_all_parties": True,
+            "default_select_all_questions": True,
+            "subplot_var": "party",
+        }
+
+    st.markdown("---")
+
     df_c, country_phrase, selected_countries = multiselect_content(
         df_experts,
         "column_match",
         "country",
-        default_multiselect_value={
-            "country": ["fin"],
-            "country_id": [14],
-            "country_fullname": ["Finland"],
-        },
+        default_multiselect_value=plot_args["default_multiselect_value_country"],
+        default_select_all=plot_args["default_select_all_countries"],
         optional_phrase=optional_country_selector,
     )
 
@@ -236,7 +261,7 @@ with st.sidebar:
         df_c,
         "column_match",
         "party",
-        default_select_all=True,
+        default_select_all=plot_args["default_select_all_parties"],
         optional_phrase=optional_party_selector,
     )
 
@@ -255,19 +280,18 @@ with st.sidebar:
     st.markdown("---")
 
     df_q, _, selected_questions = multiselect_content(
-        df_agg, "column", "question", default_select_all=False
+        df_agg,
+        "column",
+        "question",
+        default_select_all=plot_args["default_select_all_questions"],
     )
 
     st.markdown("---")
 
-    plot_option = st.selectbox(
-        "How would you like to plot?",
-        ('Country Aggregation on each question', 'Detailed survey result'))
-
-    button = st.button("Draw!")
+    button = st.button("Plot!")
 
 if button:
-    if plot_option == 'Country Aggregation on each question':
+    if plot_args["subplot_var"] == "question":
         for q in selected_questions:
             df = df_q.loc[:, q].reset_index()
             fig = px.box(
@@ -283,7 +307,7 @@ if button:
             fig.update_layout(hoverdistance=5)
             st.plotly_chart(fig)
 
-    elif plot_option == "Detailed survey result":
+    elif plot_args["subplot_var"] == "party":
         st.text("TODO: draw detailed plot")
 
 else:
