@@ -1,6 +1,7 @@
 import sqlite3 as sl
+from collections import defaultdict
 
-import altair as alt
+import numpy as np
 import pandas as pd
 import streamlit as st
 
@@ -8,9 +9,18 @@ from utils import codebook_loader, dta_to_table
 
 
 @st.cache
-def initialize(db_path, codebook_path, dta1_path, dta2_path):
-    """Save to the SQL database and join tables. This will run initially and then only run if
-    input arguments are changed.
+def initialize(db_path: str, codebook_path: str, dta1_path: str, dta2_path: str):
+    """Initialize the tables, etc.
+
+    Args:
+        db_path (str): sqlite database location
+        codebook_path (str): `2019_CHES_codebook.pdf` location
+        dta1_path (str): `CHES2019V3.dta` location
+        dta2_path (str): `CHES2019_experts.dta` location
+
+    Returns:
+        pd.DataFrame: dataframe corresponding to `CHES2019V3.dta`
+        pd.DataFrame: dataframe corresponding to `CHES2019_experts.dta`
     """
     # Save the tables
     con = sl.connect(db_path)
@@ -62,32 +72,122 @@ def initialize(db_path, codebook_path, dta1_path, dta2_path):
     return df_v3, df_experts
 
 
-def select_column(
+def multiselect_content(
     df: pd.DataFrame,
-    default_column: str,
-    optional_selector: list = [],
+    select_method: str,
+    default_phrase: str,
+    optional_phrase: list = [],
+    default_multiselect_value: dict or defaultdict = defaultdict(list),
+    default_select_all: bool = False,
 ) -> pd.DataFrame:
+    """Select part of the dataframe using streamlit multiselector
 
-    selected_colomn = st.select_slider(
-        f"Select your prefered way to display the {default_column}",
-        options=[default_column, *optional_selector],
-    )
+    Args:
+        df (pd.DataFrame): dataframe to select from
+        select_method (str): from {"column", "column_match"}. "column" means column
+            names will be used for selection, "column_match" means unique value of
+            certain column will be used.
+        default_phrase (str): default phrase to describe the object
+        optional_phrase (list, optional): optional phrases used to descibe an object,
+            e.g. `country` can also be descibed as `country_id`. Defaults to [].
+        default_multiselect_value (list, optional): what value to show in the multiselector
+            when the app started. Defaults to [].
+        default_select_all (bool, optional): Select all options by default. Defaults
+            to False.
 
-    container = st.container()
-    select_all = st.checkbox(f"Select all {selected_colomn}")
+    Returns:
+        pd.DataFrame:
+    """
 
-    if select_all:
-        selected = container.multiselect(
-            f"Choose {selected_colomn}",
-            sorted(df[selected_colomn].unique()),
-            sorted(df[selected_colomn].unique()),
+    def _multiselector(multiselect_options: list) -> list:
+        """Multiselector with select all checkbox
+
+        Args:
+            multiselect_options (list): list of options to select from
+
+        Returns:
+            list: list of selected options
+        """
+        if select_all:
+            selected_items = container.multiselect(
+                f"Choose {selected_phrase}",
+                sorted(multiselect_options),
+                sorted(multiselect_options),
+            )
+        else:
+            selected_items = container.multiselect(
+                f"Choose {selected_phrase}",
+                multiselect_options,
+                default_multiselect_value[selected_phrase],
+            )
+
+        return selected_items
+
+    if optional_phrase:
+        selected_phrase = st.select_slider(
+            f"Select your prefered phrase to display the {default_phrase}",
+            options=[default_phrase, *optional_phrase],
         )
     else:
-        selected = container.multiselect(
-            f"Choose {selected_colomn}", sorted(df[selected_colomn].unique()), []
+        selected_phrase = default_phrase
+
+    container = st.container()
+    select_all = st.checkbox(f"Select all {selected_phrase}", value=default_select_all)
+
+    if select_method == "column":
+        multiselect_options = list(
+            set(df.columns.get_level_values(default_phrase)).difference(
+                set(["country", "party"])
+            )
+        )
+        selected_items = _multiselector(multiselect_options)
+
+        return df.loc[:, selected_items], selected_phrase, selected_items
+
+    elif select_method == "column_match":
+        multiselect_options = sorted(df[selected_phrase].unique())
+        selected_items = _multiselector(multiselect_options)
+
+        return (
+            df.loc[df[selected_phrase].isin(selected_items)],
+            selected_phrase,
+            selected_items,
         )
 
-    return df.loc[df[selected_colomn].isin(selected)]
+    else:
+        raise Exception(
+            f"select_method: {select_method} not recognised./n"
+            "Please select from ['column', 'column_match']"
+        )
+
+
+@st.cache
+def aggregate(
+    df: pd.DataFrame, country_phrase: str, party_phrase: str, dropped_columns: list = []
+) -> pd.DataFrame:
+    """Aggregate dataframe, group by country and party
+
+    Args:
+        df (pd.DataFrame): dataframe to aggregate from
+        country_phrase (str): chosen phrase to describe country
+        party_phrase (str): chosen phrase to describe party
+        dropped_columns (list, optional): redundant columns not to aggregate. Defaults to [].
+
+    Returns:
+        pd.DataFrame: aggregated dataframe
+                        |    question |
+        ________________| aggregation |
+        country | party |
+    """
+    # TODO: make all party phrases unique
+    party_phrase = "party"
+    if dropped_columns:
+        df.drop(columns=set(dropped_columns).difference({country_phrase, party_phrase}))
+    grouped = df.groupby([country_phrase, party_phrase])
+    df_agg = grouped.aggregate(func=[np.nanmean, np.nanmedian, np.std, np.nanvar])
+    df_agg.columns.names = ["question", "aggregation"]
+
+    return df_agg
 
 
 db_path = st.text_input("Database path", "data/ches-data.db")
@@ -95,27 +195,48 @@ codebook_path = st.text_input("Codebook path", "data/2019_CHES_codebook.pdf")
 dta1_path = st.text_input("DTA file 1 path", "data/CHES2019V3.dta")
 dta2_path = st.text_input("DTA file 2 path", "data/CHES2019_experts.dta")
 
+optional_country_selector = ["country_id", "country_fullname"]
+optional_party_selector = ["party_id", "party_name", "party_name_english"]
+
 df_v3, df_experts = initialize(db_path, codebook_path, dta1_path, dta2_path)
 
-df_v3_c = select_column(
-    df_v3, "country", optional_selector=["country_id", "country_fullname"]
+df_c, country_phrase, selected_countries = multiselect_content(
+    df_experts,
+    "column_match",
+    "country",
+    default_multiselect_value={
+        "country": ["fin"],
+        "country_id": [14],
+        "country_fullname": ["Finland"],
+    },
+    optional_phrase=optional_country_selector,
 )
-df_v3_p = select_column(
-    df_v3_c, "party", optional_selector=["party_id", "party_name", "party_name_english"]
+
+df_p, party_phrase, selected_parties = multiselect_content(
+    df_c,
+    "column_match",
+    "party",
+    default_select_all=True,
+    optional_phrase=optional_party_selector,
+)
+
+st.dataframe(df_p)
+
+df_agg = aggregate(
+    df_p,
+    country_phrase,
+    party_phrase,
+    dropped_columns=[
+        "country",
+        "party",
+        *optional_country_selector,
+        *optional_party_selector,
+    ],
+)
+
+df_q, _, selected_questions = multiselect_content(
+    df_agg, "column", "question", default_select_all=True
 )
 
 if st.checkbox("Show dataframe"):
-    st.dataframe(df_v3_p)
-
-
-stripplot = (
-    alt.Chart(df_v3_p)
-    .mark_circle()
-    .encode(
-        x="party:O",
-        y="eu_position:Q",
-        color="party_id",
-    )
-)
-
-st.altair_chart(stripplot, use_container_width=True)
+    st.dataframe(df_q)
