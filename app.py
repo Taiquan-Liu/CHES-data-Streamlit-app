@@ -6,7 +6,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from utils import codebook_loader, dta_to_table
+from utils import codebook_loader, dta_to_table, load_questions
 
 
 @st.cache
@@ -70,7 +70,9 @@ def initialize(db_path: str, codebook_path: str, dta1_path: str, dta2_path: str)
         index_col="index",
     )
 
-    return df_v3, df_experts
+    df_questions = load_questions()
+
+    return df_v3, df_experts, df_questions
 
 
 def multiselect_content(
@@ -181,7 +183,7 @@ def aggregate(
         country | party |
     """
     if dropped_columns:
-        df.drop(columns=set(dropped_columns).difference({country_phrase, party_phrase}))
+        df = df.drop(columns=set(dropped_columns).difference({country_phrase, party_phrase}))
     grouped = df.groupby([country_phrase, party_phrase])
     df_agg = grouped.aggregate(func=[np.nanmean, np.nanmedian, np.std, np.nanvar])
     df_agg.columns.names = ["question", "aggregation"]
@@ -214,7 +216,9 @@ with st.sidebar:
     optional_country_selector = ["country_id", "country_fullname"]
     optional_party_selector = ["party_id", "party_name", "party_name_english"]
 
-    df_v3, df_experts = initialize(db_path, codebook_path, dta1_path, dta2_path)
+    df_v3, df_experts, df_questions = initialize(
+        db_path, codebook_path, dta1_path, dta2_path
+    )
 
     st.markdown("---")
 
@@ -294,10 +298,13 @@ if button:
     if plot_args["subplot_var"] == "question":
         for q in selected_questions:
             df = df_q.loc[:, q].reset_index()
+            df_questions_q = df_questions.loc[q]
+            scores = [int(m) for m in df_questions_q.loc["scores"].keys()]
             fig = px.box(
                 df,
                 y="nanmean",
                 x=country_phrase,
+                range_y = [scores[0], scores[-1]],
                 hover_data=[party_phrase],
                 title=q,
                 color=country_phrase,
@@ -306,6 +313,7 @@ if button:
             fig.update_xaxes(type="category", automargin=True)
             fig.update_layout(hoverdistance=5)
             st.plotly_chart(fig)
+            st.json(df_questions_q.to_json())
 
     elif plot_args["subplot_var"] == "party":
         # TODO: Current plot is not clear enough, draw based on question catagories?
@@ -314,7 +322,6 @@ if button:
                 columns=[
                     "country",
                     "party",
-                    "dob",
                     *optional_country_selector,
                     *optional_party_selector,
                 ]
