@@ -189,53 +189,66 @@ def aggregate(
     return df_agg
 
 
-db_path = st.text_input("Database path", "data/ches-data.db")
-codebook_path = st.text_input("Codebook path", "data/2019_CHES_codebook.pdf")
-dta1_path = st.text_input("DTA file 1 path", "data/CHES2019V3.dta")
-dta2_path = st.text_input("DTA file 2 path", "data/CHES2019_experts.dta")
-
-optional_country_selector = ["country_id", "country_fullname"]
-optional_party_selector = ["party_id", "party_name", "party_name_english"]
-
-df_v3, df_experts = initialize(db_path, codebook_path, dta1_path, dta2_path)
-
-df_c, country_phrase, selected_countries = multiselect_content(
-    df_experts,
-    "column_match",
-    "country",
-    default_multiselect_value={
-        "country": ["fin"],
-        "country_id": [14],
-        "country_fullname": ["Finland"],
-    },
-    optional_phrase=optional_country_selector,
+st.set_page_config(
+    page_title="CHES2019 Data Analysis",
+    layout="wide",
+    initial_sidebar_state="auto",
+    menu_items={
+        "Get help": "https://github.com/Taiquan-Liu/CHES-data-assignment",
+        "Report a Bug": "https://github.com/Taiquan-Liu/CHES-data-assignment/issues",
+    }
 )
 
-df_p, party_phrase, selected_parties = multiselect_content(
-    df_c,
-    "column_match",
-    "party",
-    default_select_all=True,
-    optional_phrase=optional_party_selector,
-)
+with st.sidebar:
 
-st.dataframe(df_p)
+    st.image("data/Europe_blank_map.png")
+    st.title("2019 Chapel Hill expert survey - Data analysis")
 
-df_agg = aggregate(
-    df_p,
-    country_phrase,
-    party_phrase,
-    dropped_columns=[
+    db_path = st.text_input("Database path", "data/ches-data.db")
+    codebook_path = st.text_input("Codebook path", "data/2019_CHES_codebook.pdf")
+    dta1_path = st.text_input("DTA file 1 path", "data/CHES2019V3.dta")
+    dta2_path = st.text_input("DTA file 2 path", "data/CHES2019_experts.dta")
+
+    optional_country_selector = ["country_id", "country_fullname"]
+    optional_party_selector = ["party_id", "party_name", "party_name_english"]
+
+    df_v3, df_experts = initialize(db_path, codebook_path, dta1_path, dta2_path)
+
+    df_c, country_phrase, selected_countries = multiselect_content(
+        df_experts,
+        "column_match",
         "country",
-        "party",
-        *optional_country_selector,
-        *optional_party_selector,
-    ],
-)
+        default_multiselect_value={
+            "country": ["fin"],
+            "country_id": [14],
+            "country_fullname": ["Finland"],
+        },
+        optional_phrase=optional_country_selector,
+    )
 
-df_q, _, selected_questions = multiselect_content(
-    df_agg, "column", "question", default_select_all=False
-)
+    df_p, party_phrase, selected_parties = multiselect_content(
+        df_c,
+        "column_match",
+        "party",
+        default_select_all=True,
+        optional_phrase=optional_party_selector,
+    )
+
+    df_agg = aggregate(
+        df_p,
+        country_phrase,
+        party_phrase,
+        dropped_columns=[
+            "country",
+            "party",
+            *optional_country_selector,
+            *optional_party_selector,
+        ],
+    )
+
+    df_q, _, selected_questions = multiselect_content(
+        df_agg, "column", "question", default_select_all=False
+    )
 
 for q in selected_questions:
     df = df_q.loc[:, q].reset_index()
