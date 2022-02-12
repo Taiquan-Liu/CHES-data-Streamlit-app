@@ -183,3 +183,19 @@ def dta_to_table(
             df["party_id"] = df["party_id"].replace(to_replace=1009, value=1016)
 
         df.to_sql(table_name, sql_con, if_exists=if_exists)
+
+
+def load_questions(json_path: str = "data/questions.json") -> pd.DataFrame:
+    """Load json with question metadata to a dataframe, also does necessary cleanup.
+
+    Args:
+        json_path (str): path for `questions.json`
+
+    Returns:
+        pd.DataFrame
+        __________| description | catagory | scores |
+        questions |
+    """
+    df_q = pd.read_json(json_path).T
+    df_q.index = df_q.index.str.lower()
+    return df_q

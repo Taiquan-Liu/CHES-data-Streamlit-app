@@ -1,0 +1,394 @@
+{
+    "EU_POSITION":{
+       "description":"overall orientation of the party leadership towards European integration in 2019.",
+       "catagory":"General Questions on European Integration",
+       "scores":{
+          "1":"Strongly opposed",
+          "2":"Opposed",
+          "3":"Somewhat opposed",
+          "4":"Neutral",
+          "5":"Somewhat in favor",
+          "6":"In favor",
+          "7":"Strongly in favor"
+       }
+    },
+    "EU_SALIENCE":{
+       "description":"position of the party leadership in 2019 on the internal market (i.e. free movement of goods, services, capital and labor).",
+       "catagory":"General Questions on European Integration",
+       "scores":{
+          "0":"European Integration is of no importance.",
+          "10":"European Integration is of great importance."
+       }
+    },
+    "EU_DISSENT":{
+       "description":"degree of dissent on European integration in 2019.",
+       "catagory":"General Questions on European Integration",
+       "scores":{
+          "0":"Party was completely united.",
+          "10":"Party was extremely divided."
+       }
+    },
+    "EU_BLUR":{
+       "description":"how blurry was each party's position on on European integration in 2019.",
+       "catagory":"General Questions on European Integration",
+       "scores":{
+          "0":"Not at all blurred.",
+          "10":"Extremely blurred."
+       }
+    },
+    "EU_COHESION":{
+       "description":"position of the party leadership in 2019 on EU cohesion or regional policy (e.g. the structural funds).",
+       "catagory":"Specific EU Policy Questions",
+       "scores":{
+          "1":"Strongly opposes",
+          "7":"Strongly favors"
+       }
+    },
+    "EU_FOREIGN":{
+       "description":"position of the party leadership in 2019 on EU foreign and security policy.",
+       "catagory":"Specific EU Policy Questions",
+       "scores":{
+          "1":"Strongly opposes",
+          "7":"Strongly favors"
+       }
+    },
+    "EU_INTMARK":{
+       "description":"position of the party leadership in 2019 on the internal market (i.e. free movement of goods, services, capital and labor).",
+       "catagory":"Specific EU Policy Questions",
+       "scores":{
+          "1":"Strongly opposes",
+          "7":"Strongly favors"
+       }
+    },
+    "EU_BUDGETS":{
+       "description":"position of the party leadership in 2019 on EU authority over economic and budgetary policy.",
+       "catagory":"Specific EU Policy Questions",
+       "scores":{
+          "1":"Strongly opposes",
+          "7":"Strongly favors"
+       }
+    },
+    "EU_ASYLUM":{
+       "description":"position of the party leadership in 2019 on EU authority over asylum policy.",
+       "catagory":"Ideological Questions",
+       "scores":{
+          "1":"Strongly opposes",
+          "7":"Strongly favors"
+       }
+    },
+    "LRGEN":{
+       "description":"position of the party in 2019 in terms of its overall ideological stance.",
+       "catagory":"Ideological Questions",
+       "scores":{
+          "0":"Extreme left",
+          "5":"Center",
+          "10":"Extreme right"
+       }
+    },
+    "LRECON":{
+       "description":"position of the party in 2019 in terms of its ideological stance on economic issues. Parties can be classified in terms of their stance on economic issues such as privatization, taxes, regulation, government spending, and the welfare state. Parties on the economic left want government to play an active role in the economy. Parties on the economic right want a reduced role for government.",
+       "catagory":"Ideological Questions",
+       "scores":{
+          "0":"Extreme left",
+          "5":"Center",
+          "10":"Extreme right"
+       }
+    },
+    "LRECON_SALIENCE":{
+       "description":"salience of economic issues in the party's public stance in 2019.",
+       "catagory":"Ideological Questions",
+       "scores":{
+          "0":"No importance.",
+          "10":"Great importance."
+       }
+    },
+    "LRECON_DISSENT":{
+       "description":"degree of dissent on economic issues in 2019.",
+       "catagory":"Ideological Questions",
+       "scores":{
+          "0":"Party was completely united.",
+          "10":"Party was extremely divided."
+       }
+    },
+    "LRECON_BLUR":{
+       "description":"how blurry was each party's position on economic issues in 2019.",
+       "catagory":"Ideological Questions",
+       "scores":{
+          "0":"Not at all blurred.",
+          "10":"Extremely blurred."
+       }
+    },
+    "GALTAN":{
+       "description":"position of the party in 2019 in terms of their views on social and cultural values. “Libertarian” or “postmaterialist” parties favor expanded personal freedoms, for example, abortion rights, divorce, and same-sex marriage. “Traditional” or “authoritarian” parties reject these ideas in favor of order, tradition, and stability, believing that the government should be a firm moral authority on social and cultural issues.",
+       "catagory":"Ideological Questions",
+       "scores":{
+          "0":"Libertarian/Postmaterialist",
+          "5":"Center",
+          "10":"Traditional/Authoritarian"
+       }
+    },
+    "GALTAN_SALIENCE":{
+       "description":"relative salience of libertarian/traditional issues in the party's public stance in 2019.",
+       "catagory":"Ideological Questions",
+       "scores":{
+          "0":"No importance.",
+          "10":"Great importance."
+       }
+    },
+    "GALTAN_DISSENT":{
+       "description":"degree of dissent on libertarian/traditional issues in 2019.",
+       "catagory":"Ideological Questions",
+       "scores":{
+          "0":"Party was completely united.",
+          "10":"Party was extremely divided."
+       }
+    },
+    "GALTAN_BLUR":{
+       "description":"how blurry was each party's position on libertarian/traditional issues in 2019.",
+       "catagory":"Ideological Questions",
+       "scores":{
+          "0":"Not at all blurred.",
+          "10":"Extremely blurred."
+       }
+    },
+    "IMMIGRATE_POLICY":{
+       "description":"position on immigration policy.",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"Strongly favors a liberal policy on immigration",
+          "10":"Strongly favors a restrictive policy on immigration"
+       }
+    },
+    "IMMIGRATE_SALIENCE":{
+       "description":"relative salience of imigration policy in the party's public stance in 2019.",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"No importance.",
+          "10":"Great importance."
+       }
+    },
+    "IMMIGRATE_DISSENT":{
+       "description":"degree of dissent on immigration policy in 2019.",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"Party was completely united.",
+          "10":"Party was extremely divided."
+       }
+    },
+    "MULTICULTURALISM":{
+       "description":"position on integration of immigrants and asylum seekers (multiculturalism vs. assimilation).",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"Strongly favors multiculturalism",
+          "10":"Strongly favors assimilation"
+       }
+    },
+    "MULTICULT_SALIENCE":{
+       "description":"relative salience of immigrants and asylum seekers issues in the party's public stance in 2019.",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"No importance.",
+          "10":"Great importance."
+       }
+    },
+    "MULTICULT_DISSENT":{
+       "description":"degree of dissent on immigrants and asylum seekers issues in 2019.",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"Party was completely united.",
+          "10":"Party was extremely divided."
+       }
+    },
+    "REDISTRIBUTION":{
+       "description":"position on redistribution of wealth from the rich to the poor.",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"Strongly favors redistribution.",
+          "10":"Strongly opposes redistribution."
+       }
+    },
+    "REDIST_SALIENCE":{
+       "description":"relative salience of redistribution in the party's public stance in 2019.",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"No importance.",
+          "10":"Great importance."
+       }
+    },
+    "ENVIRONMENT":{
+       "description":"position towards environmental sustainability.",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"Strongly supports environmental protection even at the cost of economic growth",
+          "10":"Strongly supports economic growth even at the cost of environmental protection."
+       }
+    },
+    "ENVIRO_SALIENCE":{
+       "description":"relative salience of environmental sustainability in the party's public stance in 2019.",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"No importance.",
+          "10":"Great importance."
+       }
+    },
+    "SPENDVTAX":{
+       "description":"position on improving public services vs. reducing taxes during 2019.",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"Strongly favors improving public services.",
+          "10":"Strongly favors reducing taxes.."
+       }
+    },
+    "DEREGULATION":{
+       "description":"position on deregulation of markets.",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"Strongly opposes deregulation of markets.",
+          "10":"Strongly favors deregulation of markets."
+       }
+    },
+    "ECON_INTERVEN":{
+       "description":"position on state intervention in the economy.",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"Fully in favor of state intervention.",
+          "10":"Fully opposed to state intervention."
+       }
+    },
+    "CIVLIB_LAWORDER":{
+       "description":"position on civil liberties vs. law and order.",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"Strongly favors civil liberties.",
+          "10":"Strongly favors tough measures to fight crime."
+       }
+    },
+    "SOCIALLIFESTYLE":{
+       "description":"position on social lifestyle (e.g. rights for homosexuals, gender equality).",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"Strongly supports liberal policies.",
+          "10":"Strongly opposes liberal policies."
+       }
+    },
+    "RELIGIOUS_PRINCIPLES":{
+       "description":"position on role of religious principles in politics.",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"Strongly opposes religious principles in politics.",
+          "10":"Strongly supports religious principles in politics."
+       }
+    },
+    "ETHNIC_MINORITIES":{
+       "description":"position towards ethnic minority rights.",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"Strongly favors more rights for ethnic minorities.",
+          "10":"Strongly opposes more rights for ethnic minorities."
+       }
+    },
+    "NATIONALISM":{
+       "description":"position towards cosmopolitanism vs. nationalism.",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"Strongly promotes cosmopolitan conceptions of society.",
+          "10":"Strongly promotes nationalist conceptions of society."
+       }
+    },
+    "URBAN_RURAL":{
+       "description":"position on urban/rural interests.",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"Strongly supports urban interests.",
+          "10":"Strongly supports rural interests."
+       }
+    },
+    "PROTECTIONISM":{
+       "description":"position towards trade liberalization/protectionism.",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"Strongly favors trade liberalization.",
+          "10":"Strongly favors protection of domestic producers."
+       }
+    },
+    "REGIONS":{
+       "description":"position on political decentralization to regions/localities.",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"Strongly favors political decentralization.",
+          "10":"Strongly opposes political decentralization."
+       }
+    },
+    "RUSSIAN_INTERFERENCE":{
+       "description":"salience of Russian interference in domestic affairs for the party leadership.",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"No importance.",
+          "10":"Great importance."
+       }
+    },
+    "ANTI_ISLAM_RHETORIC":{
+       "description":"salience of anti-Islam rhetoric for the party leadership.",
+       "catagory":"Policy Dimensions",
+       "scores":{
+          "0":"Not important at all.",
+          "10":"Extremely important."
+       }
+    },
+    "PEOPLE_VS_ELITE":{
+       "description":"position on people vs elected representatives. Some political parties take the position that 'the people' should have the final say on the most important issues, for example, by voting directly in referendums. At the opposite pole are political parties that believe that elected representatives should make the most important political decisions.",
+       "catagory":"Party characteristics",
+       "scores":{
+          "0":"Elected office holders should make the most important decisions.",
+          "10":"'The people', not politicians, should make the most important decisions."
+       }
+    },
+    "ANTIELITE_SALIENCE":{
+       "description":"salience of anti-establishment and anti-elite rhetoric.",
+       "catagory":"Party characteristics",
+       "scores":{
+          "0":"Not important at all.",
+          "10":"Extremely important."
+       }
+    },
+    "CORRUPT_SALIENCE":{
+       "description":"salience of reducing political corruption.",
+       "catagory":"Party characteristics",
+       "scores":{
+          "0":"Not important at all.",
+          "10":"Extremely important."
+       }
+    },
+    "MEMBERS_VS_LEADERSHIP":{
+       "description":"position on party leadership vs. members/activists making party policy choices.",
+       "catagory":"Party characteristics",
+       "scores":{
+          "0":"Members/activists have complete control over policy choices.",
+          "10":"Leadership has complete control over policy choices."
+       }
+    },
+    "EU_ECON_REQUIRE":{
+       "description":"position on fulfilling the economic requirements of EU membership.",
+       "catagory":"EU questions for Turkey",
+       "scores":{
+          "1":"Strongly opposed to fulfilling economic requirements.",
+          "7":"Strongly in favor of fulfilling economic requirements."
+       }
+    },
+    "EU_POLITICAL_REQUIRE":{
+       "description":"position on fulfilling the political requirements of EU membership.",
+       "catagory":"EU questions for Turkey",
+       "scores":{
+          "1":"Strongly opposed to fulfilling political requirements.",
+          "7":"Strongly in favor of fulfilling political requirements."
+       }
+    },
+    "EU_GOOGOV_REQUIRE":{
+       "description":"position on fulfilling the good governance requirements of EU membership.",
+       "catagory":"EU questions for Turkey",
+       "scores":{
+          "1":"Strongly opposed to fulfilling good governance requirements.",
+          "7":"Strongly in favor of fulfilling good governance requirements."
+       }
+    }
+ }
