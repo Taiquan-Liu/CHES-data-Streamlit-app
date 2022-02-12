@@ -308,7 +308,36 @@ if button:
             st.plotly_chart(fig)
 
     elif plot_args["subplot_var"] == "party":
-        st.text("TODO: draw detailed plot")
+        # TODO: Current plot is not clear enough, draw based on question catagories?
+        for p in selected_parties:
+            df = df_p.loc[df_p[party_phrase] == p].drop(
+                columns=[
+                    "country",
+                    "party",
+                    "dob",
+                    *optional_country_selector,
+                    *optional_party_selector,
+                ]
+            )
+            # Stack the dataframe to make it plottable by px.box
+            df_s = pd.DataFrame(df.stack())
+            df_s = df_s.reset_index()
+            df_s = df_s.rename(
+                columns={"index": "questionnaire", "level_1": "question", 0: "score"}
+            )
+            # st.dataframe(df_s)
+            fig = px.box(
+                df_s,
+                y="score",
+                x="question",
+                hover_data=["question"],
+                title=p,
+                color="question",
+                points="all",
+            )
+            fig.update_xaxes(type="category", automargin=True)
+            fig.update_layout(hoverdistance=5)
+            st.plotly_chart(fig)
 
 else:
     st.text("TODO: Print Github readme")
