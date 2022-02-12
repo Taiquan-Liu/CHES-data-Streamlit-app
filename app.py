@@ -191,7 +191,7 @@ def aggregate(
 
 st.set_page_config(
     page_title="CHES2019 Data Analysis",
-    layout="wide",
+    layout="centered",
     initial_sidebar_state="auto",
     menu_items={
         "Get help": "https://github.com/Taiquan-Liu/CHES-data-assignment",
@@ -204,6 +204,8 @@ with st.sidebar:
     st.image("data/Europe_blank_map.png")
     st.title("2019 Chapel Hill expert survey - Data analysis")
 
+    st.markdown("---")
+
     db_path = st.text_input("Database path", "data/ches-data.db")
     codebook_path = st.text_input("Codebook path", "data/2019_CHES_codebook.pdf")
     dta1_path = st.text_input("DTA file 1 path", "data/CHES2019V3.dta")
@@ -213,6 +215,8 @@ with st.sidebar:
     optional_party_selector = ["party_id", "party_name", "party_name_english"]
 
     df_v3, df_experts = initialize(db_path, codebook_path, dta1_path, dta2_path)
+
+    st.markdown("---")
 
     df_c, country_phrase, selected_countries = multiselect_content(
         df_experts,
@@ -225,6 +229,8 @@ with st.sidebar:
         },
         optional_phrase=optional_country_selector,
     )
+
+    st.markdown("---")
 
     df_p, party_phrase, selected_parties = multiselect_content(
         df_c,
@@ -246,21 +252,39 @@ with st.sidebar:
         ],
     )
 
+    st.markdown("---")
+
     df_q, _, selected_questions = multiselect_content(
         df_agg, "column", "question", default_select_all=False
     )
 
-for q in selected_questions:
-    df = df_q.loc[:, q].reset_index()
-    fig = px.box(
-        df,
-        y="nanmean",
-        x=country_phrase,
-        hover_data=[party_phrase],
-        title=q,
-        color=country_phrase,
-        points="all",
-    )
-    fig.update_xaxes(type="category", automargin=True)
-    fig.update_layout(hoverdistance=5)
-    st.plotly_chart(fig)
+    st.markdown("---")
+
+    plot_option = st.selectbox(
+        "How would you like to plot?",
+        ('Country Aggregation on each question', 'Detailed survey result'))
+
+    button = st.button("Draw!")
+
+if button:
+    if plot_option == 'Country Aggregation on each question':
+        for q in selected_questions:
+            df = df_q.loc[:, q].reset_index()
+            fig = px.box(
+                df,
+                y="nanmean",
+                x=country_phrase,
+                hover_data=[party_phrase],
+                title=q,
+                color=country_phrase,
+                points="all",
+            )
+            fig.update_xaxes(type="category", automargin=True)
+            fig.update_layout(hoverdistance=5)
+            st.plotly_chart(fig)
+
+    elif plot_option == "Detailed survey result":
+        st.text("TODO: draw detailed plot")
+
+else:
+    st.text("TODO: Print Github readme")
