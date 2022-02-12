@@ -3,6 +3,7 @@ from collections import defaultdict
 
 import numpy as np
 import pandas as pd
+import plotly.express as px
 import streamlit as st
 
 from utils import codebook_loader, dta_to_table
@@ -179,8 +180,6 @@ def aggregate(
         ________________| aggregation |
         country | party |
     """
-    # TODO: make all party phrases unique
-    party_phrase = "party"
     if dropped_columns:
         df.drop(columns=set(dropped_columns).difference({country_phrase, party_phrase}))
     grouped = df.groupby([country_phrase, party_phrase])
@@ -235,8 +234,20 @@ df_agg = aggregate(
 )
 
 df_q, _, selected_questions = multiselect_content(
-    df_agg, "column", "question", default_select_all=True
+    df_agg, "column", "question", default_select_all=False
 )
 
-if st.checkbox("Show dataframe"):
-    st.dataframe(df_q)
+for q in selected_questions:
+    df = df_q.loc[:, q].reset_index()
+    fig = px.box(
+        df,
+        y="nanmean",
+        x=country_phrase,
+        hover_data=[party_phrase],
+        title=q,
+        color=country_phrase,
+        points="all",
+    )
+    fig.update_xaxes(type="category", automargin=True)
+    fig.update_layout(hoverdistance=5)
+    st.plotly_chart(fig)

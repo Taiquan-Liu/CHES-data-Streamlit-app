@@ -17,9 +17,9 @@ setup(
     name="ches-data-analysis",
     python_requires=">=3.9.0",
     install_requires=[
-        "altair",
         "darker",
         "isort",
+        "plotly",
         "streamlit",
         "tabula-py",
     ],
