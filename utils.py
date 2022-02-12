@@ -173,8 +173,30 @@ def dta_to_table(
 
         # Cleaning up the data and unify column name
         if "CHES2019_experts" in dta_path:
-            df = df.drop(columns={"id", "party"})
-            df = df.rename(columns={"party_name": "party"})
+            df = df.drop(
+                columns={
+                    "id",  # related to questionnaire
+                    "party",  # related to questionnaire
+                    "cname",  # duplicating country_name
+                    "dob",  # date of birth cannot be drawn to the same plot
+                    "lrecon_self",  # Supposely self-evaluate question?
+                    "lrecon_sd",  # Will recalculate during aggregation
+                    "galtan_self",  # Supposely self-evaluate question?
+                    "galtan_sd",  # Will recalculate during aggregation
+                    "eu_position_sd",  # Supposely self-evaluate question?
+                    "party_a_econ",  # don't know what this is
+                    "party_b_econ",  # don't know what this is
+                    "party_c_econ",  # don't know what this is
+                    "gender",  # don't know what this is
+                }
+            )
+            df = df.rename(
+                columns={
+                    "party_name": "party",
+                    "immigra_salience": "immigrate_salience",
+                    "position": "eu_position",
+                }
+            )
 
             # Change Party ID of Fratelli d’Italia to 844, same as other tables
             df["party_id"] = df["party_id"].replace(to_replace=843, value=844)
