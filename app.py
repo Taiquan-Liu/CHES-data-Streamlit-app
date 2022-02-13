@@ -336,4 +336,4 @@ if button:
             st.json(df_questions_q.to_json())
 
 else:
-    st.text("TODO: Print Github readme")
+    st.json(df_questions.to_json())
