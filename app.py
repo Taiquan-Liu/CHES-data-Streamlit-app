@@ -233,7 +233,7 @@ with st.sidebar:
             "default_select_all_countries": True,
             "default_select_all_parties": True,
             "default_select_all_questions": False,
-            "subplot_var": "question",
+            "detail_level": "less",
         }
     elif plot_option == "Detailed survey result (Finland)":
         plot_args = {
@@ -245,7 +245,7 @@ with st.sidebar:
             "default_select_all_countries": False,
             "default_select_all_parties": True,
             "default_select_all_questions": True,
-            "subplot_var": "party",
+            "detail_level": "more",
         }
 
     st.markdown("---")
@@ -295,7 +295,7 @@ with st.sidebar:
     button = st.button("Plot!")
 
 if button:
-    if plot_args["subplot_var"] == "question":
+    if plot_args["detail_level"] == "less":
         for q in selected_questions:
             df = df_q.loc[:, q].reset_index()
             df_questions_q = df_questions.loc[q]
@@ -315,36 +315,25 @@ if button:
             st.plotly_chart(fig)
             st.json(df_questions_q.to_json())
 
-    elif plot_args["subplot_var"] == "party":
-        # TODO: Current plot is not clear enough, draw based on question catagories?
-        for p in selected_parties:
-            df = df_p.loc[df_p[party_phrase] == p].drop(
-                columns=[
-                    "country",
-                    "party",
-                    *optional_country_selector,
-                    *optional_party_selector,
-                ]
-            )
-            # Stack the dataframe to make it plottable by px.box
-            df_s = pd.DataFrame(df.stack())
-            df_s = df_s.reset_index()
-            df_s = df_s.rename(
-                columns={"index": "questionnaire", "level_1": "question", 0: "score"}
-            )
-            # st.dataframe(df_s)
+    elif plot_args["detail_level"] == "more":
+        for q in selected_questions:
+            df = df_p.loc[:, [party_phrase, q]]
+            df_questions_q = df_questions.loc[q]
+            scores = [int(m) for m in df_questions_q.loc["scores"].keys()]
             fig = px.box(
-                df_s,
-                y="score",
-                x="question",
-                hover_data=["question"],
-                title=p,
-                color="question",
+                df,
+                y=q,
+                x=party_phrase,
+                range_y = [scores[0], scores[-1]],
+                hover_data=[q],
+                title=q,
+                color=party_phrase,
                 points="all",
             )
             fig.update_xaxes(type="category", automargin=True)
             fig.update_layout(hoverdistance=5)
             st.plotly_chart(fig)
+            st.json(df_questions_q.to_json())
 
 else:
     st.text("TODO: Print Github readme")
