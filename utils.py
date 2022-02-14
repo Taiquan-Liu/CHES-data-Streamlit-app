@@ -8,9 +8,12 @@ import tabula
 class codebook_loader:
     """Load data from the code book.
 
-    :param `sql_con`: SQL connection to a database
-    :param `codebook_path`: folder for codebook, default "data/2019_CHES_codebook.pdf"
-    :param `skip_write_if_exist`: default True = skip write if table exists in the db
+    Args:
+        sql_con (sl.Connection): SQL connection to a database
+        codebook_path (str, optional): folder for codebook, default
+            "data/2019_CHES_codebook.pdf"
+        skip_write_if_exist (bool, optional): default True = skip write if table
+            exists in the db
 
     """
 
@@ -28,10 +31,11 @@ class codebook_loader:
         """Load countries from codebook page 2 and save to table "countries" in
         SQL database.
 
-        :param `table_name`: table name to store to SQL database
-        :param `if_exists`: How to behave if the table already exists, only have
-                            effect when skip_write_if_exist is False, choose
-                            from {"fail", "replace", "append"}, default "fail"
+        Args:
+            table_name (str, optional): table name to store to SQL database
+            if_exists (str, optional): How to behave if the table already exists,
+                only have effect when skip_write_if_exist is False, choose from
+                {"fail", "replace", "append"}, default "fail"
         """
 
         def load_partial_contries(self, area: list[int]) -> pd.DataFrame:
@@ -39,7 +43,11 @@ class codebook_loader:
             need to load them seperately. We also need to clean the part where
             tabula misunderstands the table.
 
-            :param `area`: [top, left, bottom, right]
+            Args:
+                area (list): [top, left, bottom, right]
+
+            Returns:
+                pd.Dataframe:
             """
             tables = tabula.read_pdf(self.codebook_path, area=area, pages=2)
             df = tables[0]
@@ -71,10 +79,11 @@ class codebook_loader:
         """Load parties from codebook page 3-11 and save to table "parties" in
         SQL database.
 
-        :param `table_name`: table name to store to SQL database
-        :param `if_exists`: How to behave if the table already exists, only have
-                            effect when skip_write_if_exist is False, choose
-                            from {"fail", "replace", "append"}, default "fail"
+        Args:
+            table_name (str, optional): table name to store to SQL database
+            if_exists (str, optional): How to behave if the table already exists,
+                only have effect when skip_write_if_exist is False, choose from
+                {"fail", "replace", "append"}, default "fail"
         """
 
         if pd.io.sql.has_table(table_name, self.sql_con) and self.skip_write_if_exist:
@@ -143,7 +152,7 @@ class codebook_loader:
             df.to_sql(table_name, self.sql_con, if_exists=if_exists)
 
     def save_questions():
-
+        # TODO: Automate extrating questions from codebook
         return
 
 
@@ -156,14 +165,15 @@ def dta_to_table(
 ):
     """Load csv data as SQL database table.
 
-    :param `sql_con`: SQL connection to a database
-    :param `dta_path`: dta file path to load
-    :param `table_name`: SQL table name to save
-    :param `skip_write_if_exist`: default True = skip write if table exists
-                                  in the db
-    :param `if_exists`: How to behave if the table already exists, only have
-                        effect when skip_write_if_exist is False, choose
-                        from {"fail", "replace", "append"}, default "fail"
+    Args:
+        sql_con (s1.Connection): SQL connection to a database
+        dta_path (str): dta file path to load
+        table_name (str): SQL table name to save
+        skip_write_if_exist (bool, optional): default True = skip write if table
+            exists in the db
+        if_exists (str, optional): How to behave if the table already exists, only
+            have effect when skip_write_if_exist is False, choose from
+            {"fail", "replace", "append"}, default "fail"
     """
 
     if pd.io.sql.has_table(table_name, sql_con) and skip_write_if_exist:

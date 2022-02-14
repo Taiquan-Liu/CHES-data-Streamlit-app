@@ -103,7 +103,7 @@ def multiselect_content(
     """
 
     def _multiselector(multiselect_options: list) -> list:
-        """Multiselector with select all checkbox
+        """Multiselector with "select all" checkbox
 
         Args:
             multiselect_options (list): list of options to select from
@@ -111,12 +111,18 @@ def multiselect_content(
         Returns:
             list: list of selected options
         """
+        container = st.container()
+        select_all = st.checkbox(
+            f"Select all {selected_phrase}", value=default_select_all
+        )
+        # "Select all" checkbox is checked
         if select_all:
             selected_items = container.multiselect(
                 f"Choose {selected_phrase}",
                 sorted(multiselect_options),
                 sorted(multiselect_options),
             )
+        # "Select all" checkbox is unchecked
         else:
             selected_items = container.multiselect(
                 f"Choose {selected_phrase}",
@@ -126,6 +132,7 @@ def multiselect_content(
 
         return selected_items
 
+    # Select slider to choose which phrase to use. e.g. country or country_id
     if optional_phrase:
         selected_phrase = st.select_slider(
             f"Select your prefered phrase to display the {default_phrase}",
@@ -133,9 +140,6 @@ def multiselect_content(
         )
     else:
         selected_phrase = default_phrase
-
-    container = st.container()
-    select_all = st.checkbox(f"Select all {selected_phrase}", value=default_select_all)
 
     if select_method == "column":
         multiselect_options = list(
@@ -160,7 +164,7 @@ def multiselect_content(
     else:
         raise Exception(
             f"select_method: {select_method} not recognised./n"
-            "Please select from ['column', 'column_match']"
+            "Please select from {'column', 'column_match'}"
         )
 
 
@@ -174,7 +178,8 @@ def aggregate(
         df (pd.DataFrame): dataframe to aggregate from
         country_phrase (str): chosen phrase to describe country
         party_phrase (str): chosen phrase to describe party
-        dropped_columns (list, optional): redundant columns not to aggregate. Defaults to [].
+        dropped_columns (list, optional): redundant columns not to aggregate. Defaults
+            to [].
 
     Returns:
         pd.DataFrame: aggregated dataframe
@@ -191,149 +196,158 @@ def aggregate(
     return df_agg
 
 
-st.set_page_config(
-    page_title="CHES2019 Data Analysis",
-    layout="centered",
-    initial_sidebar_state="auto",
-    menu_items={
-        "Get help": "https://github.com/Taiquan-Liu/CHES-data-assignment",
-        "Report a Bug": "https://github.com/Taiquan-Liu/CHES-data-assignment/issues",
-    },
-)
-
-with st.sidebar:
-
-    st.image("data/Europe_blank_map.png")
-    st.title("2019 Chapel Hill expert survey - Data analysis")
-
-    st.markdown("---")
-
-    db_path = st.text_input("Database path", "data/ches-data.db")
-    codebook_path = st.text_input("Codebook path", "data/2019_CHES_codebook.pdf")
-    dta1_path = st.text_input("DTA file 1 path", "data/CHES2019V3.dta")
-    dta2_path = st.text_input("DTA file 2 path", "data/CHES2019_experts.dta")
-
-    optional_country_selector = ["country_id", "country_fullname"]
-    optional_party_selector = ["party_id", "party_name", "party_name_english"]
-
-    df_v3, df_experts, df_questions = initialize(
-        db_path, codebook_path, dta1_path, dta2_path
+def main():
+    st.set_page_config(
+        page_title="CHES2019 Data Analysis",
+        layout="centered",
+        initial_sidebar_state="auto",
+        menu_items={
+            "Get help": "https://github.com/Taiquan-Liu/CHES-data-assignment",
+            "Report a Bug": "https://github.com/Taiquan-Liu/CHES-data-assignment/issues",
+        },
     )
 
-    st.markdown("---")
+    with st.sidebar:
 
-    plot_option = st.selectbox(
-        "How would you like to plot?",
-        ("Country Aggregation on each question", "Detailed survey result (Finland)"),
-    )
+        st.image("data/Europe_blank_map.png")
+        st.title("2019 Chapel Hill expert survey - Data analysis")
 
-    if plot_option == "Country Aggregation on each question":
-        plot_args = {
-            "default_multiselect_value_country": defaultdict(list),
-            "default_select_all_countries": True,
-            "default_select_all_parties": True,
-            "default_select_all_questions": False,
-            "detail_level": "less",
-        }
-    elif plot_option == "Detailed survey result (Finland)":
-        plot_args = {
-            "default_multiselect_value_country": {
-                "country": ["fin"],
-                "country_id": [14],
-                "country_fullname": ["Finland"],
-            },
-            "default_select_all_countries": False,
-            "default_select_all_parties": True,
-            "default_select_all_questions": True,
-            "detail_level": "more",
-        }
+        st.markdown("---")
 
-    st.markdown("---")
+        db_path = st.text_input("Database path", "data/ches-data.db")
+        codebook_path = st.text_input("Codebook path", "data/2019_CHES_codebook.pdf")
+        dta1_path = st.text_input("DTA file 1 path", "data/CHES2019V3.dta")
+        dta2_path = st.text_input("DTA file 2 path", "data/CHES2019_experts.dta")
 
-    df_c, country_phrase, selected_countries = multiselect_content(
-        df_experts,
-        "column_match",
-        "country",
-        default_multiselect_value=plot_args["default_multiselect_value_country"],
-        default_select_all=plot_args["default_select_all_countries"],
-        optional_phrase=optional_country_selector,
-    )
+        optional_country_selector = ["country_id", "country_fullname"]
+        optional_party_selector = ["party_id", "party_name", "party_name_english"]
 
-    st.markdown("---")
+        df_v3, df_experts, df_questions = initialize(
+            db_path, codebook_path, dta1_path, dta2_path
+        )
 
-    df_p, party_phrase, selected_parties = multiselect_content(
-        df_c,
-        "column_match",
-        "party",
-        default_select_all=plot_args["default_select_all_parties"],
-        optional_phrase=optional_party_selector,
-    )
+        st.markdown("---")
 
-    df_agg = aggregate(
-        df_p,
-        country_phrase,
-        party_phrase,
-        dropped_columns=[
+        plot_option = st.selectbox(
+            "How would you like to plot?",
+            (
+                "Country Aggregation on each question",
+                "Detailed survey result (Finland)",
+            ),
+        )
+
+        if plot_option == "Country Aggregation on each question":
+            plot_args = {
+                "default_multiselect_value_country": defaultdict(list),
+                "default_select_all_countries": True,
+                "default_select_all_parties": True,
+                "default_select_all_questions": False,
+                "detail_level": "less",
+            }
+        elif plot_option == "Detailed survey result (Finland)":
+            plot_args = {
+                "default_multiselect_value_country": {
+                    "country": ["fin"],
+                    "country_id": [14],
+                    "country_fullname": ["Finland"],
+                },
+                "default_select_all_countries": False,
+                "default_select_all_parties": True,
+                "default_select_all_questions": True,
+                "detail_level": "more",
+            }
+
+        st.markdown("---")
+
+        df_c, country_phrase, selected_countries = multiselect_content(
+            df_experts,
+            "column_match",
             "country",
+            default_multiselect_value=plot_args["default_multiselect_value_country"],
+            default_select_all=plot_args["default_select_all_countries"],
+            optional_phrase=optional_country_selector,
+        )
+
+        st.markdown("---")
+
+        df_p, party_phrase, selected_parties = multiselect_content(
+            df_c,
+            "column_match",
             "party",
-            *optional_country_selector,
-            *optional_party_selector,
-        ],
-    )
+            default_select_all=plot_args["default_select_all_parties"],
+            optional_phrase=optional_party_selector,
+        )
 
-    st.markdown("---")
+        df_agg = aggregate(
+            df_p,
+            country_phrase,
+            party_phrase,
+            dropped_columns=[
+                "country",
+                "party",
+                *optional_country_selector,
+                *optional_party_selector,
+            ],
+        )
 
-    df_q, _, selected_questions = multiselect_content(
-        df_agg,
-        "column",
-        "question",
-        default_select_all=plot_args["default_select_all_questions"],
-    )
+        st.markdown("---")
 
-    st.markdown("---")
+        df_q, _, selected_questions = multiselect_content(
+            df_agg,
+            "column",
+            "question",
+            default_select_all=plot_args["default_select_all_questions"],
+        )
 
-    button = st.button("Plot!")
+        st.markdown("---")
 
-if button:
-    if plot_args["detail_level"] == "less":
-        for q in selected_questions:
-            df = df_q.loc[:, q].reset_index()
-            df_questions_q = df_questions.loc[q]
-            scores = [int(m) for m in df_questions_q.loc["scores"].keys()]
-            fig = px.box(
-                df,
-                y="nanmean",
-                x=country_phrase,
-                range_y = [scores[0], scores[-1]],
-                hover_data=[party_phrase],
-                title=q,
-                color=country_phrase,
-                points="all",
-            )
-            fig.update_xaxes(type="category", automargin=True)
-            fig.update_layout(hoverdistance=5)
-            st.plotly_chart(fig)
-            st.json(df_questions_q.to_json())
+        button = st.button("Plot!")
 
-    elif plot_args["detail_level"] == "more":
-        for q in selected_questions:
-            df = df_p.loc[:, [party_phrase, q]]
-            df_questions_q = df_questions.loc[q]
-            scores = [int(m) for m in df_questions_q.loc["scores"].keys()]
-            fig = px.box(
-                df,
-                y=q,
-                x=party_phrase,
-                range_y = [scores[0], scores[-1]],
-                hover_data=[q],
-                title=q,
-                color=party_phrase,
-                points="all",
-            )
-            fig.update_xaxes(type="category", automargin=True)
-            fig.update_layout(hoverdistance=5)
-            st.plotly_chart(fig)
-            st.json(df_questions_q.to_json())
+    if button:
+        if plot_args["detail_level"] == "less":
+            for q in selected_questions:
+                df = df_q.loc[:, q].reset_index()
+                df_questions_q = df_questions.loc[q]
+                scores = [int(m) for m in df_questions_q.loc["scores"].keys()]
+                fig = px.box(
+                    df,
+                    y="nanmean",
+                    x=country_phrase,
+                    range_y=[scores[0], scores[-1]],
+                    hover_data=[party_phrase],
+                    title=q,
+                    color=country_phrase,
+                    points="all",
+                )
+                fig.update_xaxes(type="category", automargin=True)
+                fig.update_layout(hoverdistance=5)
+                st.plotly_chart(fig)
+                st.json(df_questions_q.to_json())
 
-else:
-    st.json(df_questions.to_json())
+        elif plot_args["detail_level"] == "more":
+            for q in selected_questions:
+                df = df_p.loc[:, [party_phrase, q]]
+                df_questions_q = df_questions.loc[q]
+                scores = [int(m) for m in df_questions_q.loc["scores"].keys()]
+                fig = px.box(
+                    df,
+                    y=q,
+                    x=party_phrase,
+                    range_y=[scores[0], scores[-1]],
+                    hover_data=[q],
+                    title=q,
+                    color=party_phrase,
+                    points="all",
+                )
+                fig.update_xaxes(type="category", automargin=True)
+                fig.update_layout(hoverdistance=5)
+                st.plotly_chart(fig)
+                st.json(df_questions_q.to_json())
+
+    else:
+        st.subheader("Questions to choose from:")
+        st.json(df_questions.to_json())
+
+
+if __name__ == "__main__":
+    main()
