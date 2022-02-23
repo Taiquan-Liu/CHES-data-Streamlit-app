@@ -1,5 +1,5 @@
 FROM openjdk:slim
-COPY --from=python:3.9.10-slim-buster / /
+COPY --from=python:3.9.10-slim / /
 
 COPY setup.py .
 RUN pip install -e .
