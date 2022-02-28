@@ -322,7 +322,8 @@ def main():
                 fig.update_xaxes(type="category", automargin=True)
                 fig.update_layout(hoverdistance=5)
                 st.plotly_chart(fig)
-                st.json(df_questions_q.to_json())
+                with st.expander("See explanation"):
+                    st.json(df_questions_q.to_json())
 
         elif plot_args["detail_level"] == "more":
             for q in selected_questions:
@@ -342,7 +343,8 @@ def main():
                 fig.update_xaxes(type="category", automargin=True)
                 fig.update_layout(hoverdistance=5)
                 st.plotly_chart(fig)
-                st.json(df_questions_q.to_json())
+                with st.expander("See explanation"):
+                    st.json(df_questions_q.to_json())
 
     else:
         st.subheader("Questions to choose from:")
