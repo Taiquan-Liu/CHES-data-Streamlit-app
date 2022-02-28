@@ -19,8 +19,11 @@ setup(
     install_requires=[
         "darker",
         "isort",
+        "graphviz",
         "plotly",
+        "pyvis",
         "streamlit",
+        "streamlit_agraph"
         "tabula-py",
     ],
     tests_require=REQUIREMENTS_TESTING,

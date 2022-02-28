@@ -1,10 +1,14 @@
 import sqlite3 as sl
 from collections import defaultdict
 
+import graphviz
 import numpy as np
+import networkx as nx
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+from pyvis.network import Network
+from streamlit_agraph import agraph, Node, Edge, Config
 
 from utils import codebook_loader, dta_to_table, load_questions
 
@@ -347,8 +351,32 @@ def main():
                     st.json(df_questions_q.to_json())
 
     else:
-        st.subheader("Questions to choose from:")
-        st.json(df_questions.to_json())
+        edges = df_agg.index.values
+        with st.expander("Relationship between countries and parties (graphviz)"):
+            graph = graphviz.Digraph()
+            graph.edges(edges)
+            st.graphviz_chart(graph)
+        with st.expander("Relationship between countries and parties (streamlit-agraph)"):
+            nodes_sa = set()
+            edges_sa = set()
+            for edge in edges:
+                for node in edge:
+                    nodes_sa.add(Node(node))
+                edges_sa.add(Edge(edge[0], edge[1]))
+            config_sa = Config()
+            agraph(nodes=nodes_sa, edges=edges_sa, config=config_sa)
+        with st.expander("Relationship between countries and parties (pyvis)"):
+            G = nx.DiGraph()
+            G.add_edges_from(edges)
+            graph = Network(width="100%", height = "1000px")
+            graph.barnes_hut()
+            graph.from_nx(G)
+            graph.save_graph("c-p.html")
+            HtmlFile = open("c-p.html", 'r', encoding='utf-8')
+            source_code = HtmlFile.read()
+            st.components.v1.html(source_code, height = 1000)
+        with st.expander("Detailes about questions"):
+            st.json(df_questions.to_json())
 
 
 if __name__ == "__main__":
